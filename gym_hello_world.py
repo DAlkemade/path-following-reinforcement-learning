@@ -1,5 +1,8 @@
 import gym
-env = gym.make('CartPole-v0')
+# import gym_line_follower
+import gym_path
+env = gym.make("PathFollower-v0")
+# env = gym.make("LineFollower-v0")
 for i_episode in range(20):
     observation = env.reset()
     for t in range(100):
