@@ -14,7 +14,7 @@ MAX_STEPS_IN_RUN = 10000
 MEMORY_SIZE = 3000
 EPSILON = .1
 GAMMA = .99
-BATCH = 20
+BATCH = 15
 
 # tf.keras.backend.set_floatx('float64')
 
