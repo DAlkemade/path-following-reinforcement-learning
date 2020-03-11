@@ -131,7 +131,6 @@ def main():
         cumulative_reward = 0
         for t in range(1, MAX_STEPS_IN_RUN + 1):
             env.render()
-            # TODO action should be onehot (or actually maybe not, think about it)
             if random.random() < EPSILON:
                 action_index = random.randint(0, len(discrete_actions) - 1)
             else:
