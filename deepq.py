@@ -6,10 +6,11 @@ from collections import deque, namedtuple
 import gym
 # noinspection PyUnresolvedReferences
 import gym_path
+import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
-NUM_RUNS = 1000
+NUM_RUNS = 100
 MAX_STEPS_IN_RUN = 10000
 MEMORY_SIZE = 10000
 EPSILON = .1
@@ -125,33 +126,47 @@ def main():
     memory = Memory(MEMORY_SIZE)
     train_network = DQN(num_states, num_actions)
     target_network = DQN(num_states, num_actions)
+    costs_list = []
+    rewards = []
+    try:
+        for i_episode in range(NUM_RUNS):
+            observation = env.reset()
+            cumulative_reward = 0.
+            for t in range(1, MAX_STEPS_IN_RUN + 1):
+                env.render()
+                if random.random() < EPSILON:
+                    action_index = random.randint(0, len(discrete_actions) - 1)
+                else:
+                    prediction = target_network.predict(np.reshape(observation, (1, num_states)))
+                    action_index = np.argmax(prediction)
 
-    for i_episode in range(NUM_RUNS):
-        observation = env.reset()
-        cumulative_reward = 0
-        for t in range(1, MAX_STEPS_IN_RUN + 1):
-            env.render()
-            if random.random() < EPSILON:
-                action_index = random.randint(0, len(discrete_actions) - 1)
-            else:
-                prediction = target_network.predict(np.reshape(observation, (1, num_states)))
-                action_index = np.argmax(prediction)
+                action = discrete_actions[action_index]
+                prev_observation = observation
+                observation, reward, done, info = env.step(action)
+                cumulative_reward += reward
+                memory.append(Experience(prev_observation, action_index, reward, observation, done))
+                if t % BATCH == 0:
+                    batch_train = memory.all_entries()
+                    train_network.train(batch_train, target_network)
 
-            action = discrete_actions[action_index]
-            prev_observation = observation
-            observation, reward, done, info = env.step(action)
-            memory.append(Experience(prev_observation, action_index, reward, observation, done))
-            if t % BATCH == 0:
-                batch_train = memory.all_entries()
-                train_network.train(batch_train, target_network)
+                if t % COPY_STEP:
+                    target_network.copy_weights(train_network)
 
-            if t % COPY_STEP:
-                target_network.copy_weights(train_network)
+                if done:
+                    print(f"Episode {i_episode} finished after {t + 1} timesteps")
+                    break
 
-            if done:
-                print("Episode finished after {} timesteps".format(t + 1))
-                break
+            rewards.append(cumulative_reward)
+    except KeyboardInterrupt:
+        pass
     env.close()
+
+    print(rewards)
+    plt.plot(range(len(rewards)), rewards)
+    plt.xlabel('Games number')
+    plt.ylabel('Reward')
+    plt.yscale('symlog')
+    plt.show()
 
 
 if __name__ == "__main__":
