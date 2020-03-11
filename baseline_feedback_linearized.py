@@ -1,14 +1,16 @@
 import gym
+# noinspection PyUnresolvedReferences
+import gym_path
 import numpy as np
-# import gym_line_follower
 
 env = gym.make("PathFollower-v0")
-# env = gym.make("LineFollower-v0")
 
 X = 0
 Y = 1
 YAW = 2
 SPEED = 1.
+
+num_states = len(env.observation_space.sample())
 
 
 def feedback_linearized(pose, velocity, epsilon):
@@ -65,7 +67,7 @@ for i_episode in range(20):
     for t in range(300):
         env.render()
         print(observation)
-        path_points = np.reshape(observation, (10, 2))
+        path_points = np.reshape(observation, (int(num_states/2), 2))
         print(path_points)
         velocity = get_velocity([0., 0.], path_points)
         u, w = feedback_linearized([0., 0., 0.], velocity, .1)
