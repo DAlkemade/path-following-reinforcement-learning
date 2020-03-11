@@ -1,9 +1,9 @@
 import gym
+# noinspection PyUnresolvedReferences
+import gym_path
 import numpy as np
-# import gym_line_follower
 
 env = gym.make("PathFollower-v0")
-# env = gym.make("LineFollower-v0")
 
 X = 0
 Y = 1
