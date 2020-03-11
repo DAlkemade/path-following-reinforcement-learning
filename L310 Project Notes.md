@@ -39,3 +39,10 @@ The action space is continuous, so how to do the equivalent of an argmax over th
 
 In addition, our action space is 2d. If first discretizing the action space, should I thus create new actions, which are actually pairs of ` [u,w]`?
 Or can I make v the input to the environment and let the environment do the feedback_linearization?
+
+## Next steps:
+* think about which path points I'm giving the robot. maybe give more, less, or depending on what's in front rather than just the closest
+* Reduce the number of actions to make it simpler.
+* use a target network
+## References
+https://arxiv.org/pdf/1511.04143.pdf about continous action spaces etc
