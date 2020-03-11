@@ -62,14 +62,6 @@ class Memory(object):
 
 Experience = namedtuple('Experience', ['state', 'action', 'reward', 'next_state', 'done'])
 
-env = gym.make("PathFollower-v0")
-
-num_states = len(env.observation_space.sample())
-hidden_units = [200, 200]
-num_actions = len(discrete_actions)
-
-memory = Memory(MEMORY_SIZE)
-
 
 class DQN(object):
     def __init__(self, observation_space_size, action_space_size):
@@ -86,6 +78,7 @@ class DQN(object):
 
     def train(self, batch, target_model):
         batch_size = len(batch)
+        num_states = len(batch[0].state)
         states, actions, rewards, next_states, dones = zip(*batch)
         rewards = np.array(rewards, dtype=np.float32)
         dones = np.array(dones, dtype=np.float32)
@@ -123,36 +116,44 @@ class DQN(object):
             v1.assign(v2.numpy())
 
 
-train_network = DQN(num_states, num_actions)
-target_network = DQN(num_states, num_actions)
+def main():
+    env = gym.make("PathFollower-v0")
 
-for i_episode in range(NUM_RUNS):
-    observation = env.reset()
-    cumulative_reward = 0
-    for t in range(1, MAX_STEPS_IN_RUN + 1):
-        env.render()
-        # TODO action should be onehot (or actually maybe not, think about it)
-        if random.random() < EPSILON:
-            action_index = random.randint(0, len(discrete_actions) - 1)
-        else:
-            prediction = target_network.predict(np.reshape(observation, (1, num_states)))
-            action_index = np.argmax(prediction)
+    num_states = len(env.observation_space.sample())
+    num_actions = len(discrete_actions)
 
-        action = discrete_actions[action_index]
-        prev_observation = observation
-        observation, reward, done, info = env.step(action)
-        memory.append(Experience(prev_observation, action_index, reward, observation, done))
-        if t % BATCH == 0:
-            # TODO if choosing to use a larger batch size, do this in a @tf.function
-            # batch_train = memory.sample(BATCH)
-            batch_train = memory.all_entries()
-            train_network.train(batch_train, target_network)
-            # model.fit(states, total_rewards_discounted_include_done, epochs=1)
+    memory = Memory(MEMORY_SIZE)
+    train_network = DQN(num_states, num_actions)
+    target_network = DQN(num_states, num_actions)
 
-        if t % COPY_STEP:
-            target_network.copy_weights(train_network)
+    for i_episode in range(NUM_RUNS):
+        observation = env.reset()
+        cumulative_reward = 0
+        for t in range(1, MAX_STEPS_IN_RUN + 1):
+            env.render()
+            # TODO action should be onehot (or actually maybe not, think about it)
+            if random.random() < EPSILON:
+                action_index = random.randint(0, len(discrete_actions) - 1)
+            else:
+                prediction = target_network.predict(np.reshape(observation, (1, num_states)))
+                action_index = np.argmax(prediction)
 
-        if done:
-            print("Episode finished after {} timesteps".format(t + 1))
-            break
-env.close()
+            action = discrete_actions[action_index]
+            prev_observation = observation
+            observation, reward, done, info = env.step(action)
+            memory.append(Experience(prev_observation, action_index, reward, observation, done))
+            if t % BATCH == 0:
+                batch_train = memory.all_entries()
+                train_network.train(batch_train, target_network)
+
+            if t % COPY_STEP:
+                target_network.copy_weights(train_network)
+
+            if done:
+                print("Episode finished after {} timesteps".format(t + 1))
+                break
+    env.close()
+
+
+if __name__ == "__main__":
+    main()
