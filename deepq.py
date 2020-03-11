@@ -11,10 +11,11 @@ import tensorflow as tf
 
 NUM_RUNS = 1000
 MAX_STEPS_IN_RUN = 10000
-MEMORY_SIZE = 3000
+MEMORY_SIZE = 10000
 EPSILON = .1
 GAMMA = .99
 BATCH = 15
+COPY_STEP = 25
 
 # tf.keras.backend.set_floatx('float64')
 
@@ -37,11 +38,26 @@ class Memory(object):
     def __init__(self, buffer_size):
         self.memory = deque(maxlen=buffer_size)
 
+    @property
+    def size(self):
+        return len(self.memory)
+
     def append(self, item):
+        """Append item to memory."""
         self.memory.append(item)
 
     def sample(self, size):
+        """Sample elements from memory."""
         return random.sample(self.memory, size)
+
+    def all_entries(self):
+        """Return all entries, floored at the nearest 1000.
+
+        This is useful to increase the batch size less often, so
+        that the tensorflow graph does not have to be recreated every time for a slightly higher batch size.
+        """
+        batch_size = self.size - (self.size % 1000) if self.size >= 1000 else self.size
+        return list(self.sample(batch_size))
 
 
 Experience = namedtuple('Experience', ['state', 'action', 'reward', 'next_state', 'done'])
@@ -68,14 +84,14 @@ class DQN(object):
     def predict(self, states):
         return self.model(states)
 
-    # @tf.function
-    def train(self, batch):
+    def train(self, batch, target_model):
+        batch_size = len(batch)
         states, actions, rewards, next_states, dones = zip(*batch)
         rewards = np.array(rewards, dtype=np.float32)
         dones = np.array(dones, dtype=np.float32)
-        next_states = np.reshape(next_states, (BATCH, num_states))
-        states = np.reshape(states, (BATCH, num_states))
-        next_predictions = self.model(next_states)
+        next_states = np.reshape(next_states, (batch_size, num_states))
+        states = np.reshape(states, (batch_size, num_states))
+        next_predictions = target_model.predict(next_states)
         next_predictions_max = np.max(next_predictions, axis=1)
         total_rewards_discounted = rewards + GAMMA * next_predictions_max
         total_rewards_discounted_include_done = np.where(dones, rewards, total_rewards_discounted)
@@ -96,8 +112,19 @@ class DQN(object):
         gradients = tape.gradient(loss, variables)
         self.optimizer.apply_gradients(zip(gradients, variables))
 
+    def copy_weights(self, train_model):
+        """Copy weights from training model to this (Target) model.
+
+        Adapted from https://github.com/VXU1230/reinforcement_learning/blob/master/dqn/cart_pole.py
+        """
+        variables1 = self.model.trainable_variables
+        variables2 = train_model.model.trainable_variables
+        for v1, v2 in zip(variables1, variables2):
+            v1.assign(v2.numpy())
+
 
 train_network = DQN(num_states, num_actions)
+target_network = DQN(num_states, num_actions)
 
 for i_episode in range(NUM_RUNS):
     observation = env.reset()
@@ -108,7 +135,7 @@ for i_episode in range(NUM_RUNS):
         if random.random() < EPSILON:
             action_index = random.randint(0, len(discrete_actions) - 1)
         else:
-            prediction = train_network.predict(np.reshape(observation, (1, num_states)))
+            prediction = target_network.predict(np.reshape(observation, (1, num_states)))
             action_index = np.argmax(prediction)
 
         action = discrete_actions[action_index]
@@ -117,9 +144,13 @@ for i_episode in range(NUM_RUNS):
         memory.append(Experience(prev_observation, action_index, reward, observation, done))
         if t % BATCH == 0:
             # TODO if choosing to use a larger batch size, do this in a @tf.function
-            batch_train = memory.sample(BATCH)
-            train_network.train(batch_train)
+            # batch_train = memory.sample(BATCH)
+            batch_train = memory.all_entries()
+            train_network.train(batch_train, target_network)
             # model.fit(states, total_rewards_discounted_include_done, epochs=1)
+
+        if t % COPY_STEP:
+            target_network.copy_weights(train_network)
 
         if done:
             print("Episode finished after {} timesteps".format(t + 1))
