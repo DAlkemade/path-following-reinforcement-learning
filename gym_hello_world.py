@@ -1,6 +1,6 @@
 import gym
 # import gym_line_follower
-import gym_path
+
 env = gym.make("PathFollower-v0")
 # env = gym.make("LineFollower-v0")
 for i_episode in range(20):
@@ -11,6 +11,6 @@ for i_episode in range(20):
         action = env.action_space.sample()
         observation, reward, done, info = env.step(action)
         if done:
-            print("Episode finished after {} timesteps".format(t+1))
+            print("Episode finished after {} timesteps".format(t + 1))
             break
 env.close()
