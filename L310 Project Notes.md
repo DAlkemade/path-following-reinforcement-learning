@@ -33,3 +33,9 @@ for the extension, the idea is that you take a working controller to follow the 
 Create custom openai environment. Define reward function as something like: the further away from the path, the lower the reward.
 
 he thinks implementing it myself is more interesting for the report than using the baslines package and it shouldn't be too much work.
+
+## Question on action space
+The action space is continuous, so how to do the equivalent of an argmax over the NN outputs?
+
+In addition, our action space is 2d. If first discretizing the action space, should I thus create new actions, which are actually pairs of ` [u,w]`?
+Or can I make v the input to the environment and let the environment do the feedback_linearization?
