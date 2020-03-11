@@ -14,9 +14,9 @@ MAX_STEPS_IN_RUN = 10000
 MEMORY_SIZE = 3000
 EPSILON = .1
 GAMMA = .99
-BATCH = 15
+BATCH = 20
 
-mnist = tf.keras.datasets.mnist
+# tf.keras.backend.set_floatx('float64')
 
 discrete_vs = np.linspace(0, 1, 3)
 discrete_ws = np.linspace(-np.pi, np.pi, 5)  # make sure it's uneven, so that 0. is in there
@@ -46,10 +46,6 @@ class Memory(object):
 
 Experience = namedtuple('Experience', ['state', 'action', 'reward', 'next_state', 'done'])
 
-# loss_fn = tf.keras.losses.MeanSquaredError()
-# model.compile(optimizer='adam',
-#               # loss=loss_fn,
-#               metrics=['accuracy'])
 env = gym.make("PathFollower-v0")
 
 num_states = len(env.observation_space.sample())
@@ -75,19 +71,27 @@ class DQN(object):
     # @tf.function
     def train(self, batch):
         states, actions, rewards, next_states, dones = zip(*batch)
-        rewards = np.array(rewards)
-        dones = np.array(dones)
+        rewards = np.array(rewards, dtype=np.float32)
+        dones = np.array(dones, dtype=np.float32)
         next_states = np.reshape(next_states, (BATCH, num_states))
         states = np.reshape(states, (BATCH, num_states))
         next_predictions = self.model(next_states)
         next_predictions_max = np.max(next_predictions, axis=1)
         total_rewards_discounted = rewards + GAMMA * next_predictions_max
         total_rewards_discounted_include_done = np.where(dones, rewards, total_rewards_discounted)
+        states = tf.convert_to_tensor(states, dtype=tf.float32)
+        actions = tf.convert_to_tensor(actions, dtype=tf.int64)
+        total_rewards_discounted_include_done = tf.convert_to_tensor(total_rewards_discounted_include_done,
+                                                                     dtype=tf.float32)
+        self._optimize_model(states, actions, total_rewards_discounted_include_done)
 
+    @tf.function
+    def _optimize_model(self, states, actions, final_rewards):
         with tf.GradientTape() as tape:
-            selected_action_values = tf.math.reduce_sum(self.model(states) * tf.one_hot(actions, len(discrete_actions)),
-                                                        axis=1)
-            loss = tf.math.reduce_sum(tf.square(total_rewards_discounted_include_done - selected_action_values))
+            selected_action_values = tf.math.reduce_sum(
+                self.model(states) * tf.one_hot(actions, len(discrete_actions), dtype=np.float32),
+                axis=1)
+            loss = tf.math.reduce_sum(tf.square(final_rewards - selected_action_values))
         variables = self.model.trainable_variables
         gradients = tape.gradient(loss, variables)
         self.optimizer.apply_gradients(zip(gradients, variables))
