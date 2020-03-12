@@ -67,7 +67,7 @@ for i_episode in range(20):
     for t in range(300):
         env.render()
         print(observation)
-        path_points = np.reshape(observation, (int(num_states/2), 2))
+        path_points = np.reshape(observation, (int(num_states / 2), 2))
         print(path_points)
         velocity = get_velocity([0., 0.], path_points)
         u, w = feedback_linearized([0., 0., 0.], velocity, .1)
