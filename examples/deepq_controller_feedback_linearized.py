@@ -1,5 +1,3 @@
-# noinspection PyUnresolvedReferences
-import gym_path
 import numpy as np
 
 from path_following_reinforcement_learning.experiment import Experiment
@@ -19,16 +17,13 @@ def main():
     Learn to control the robot in the PathFollower environment where the actions are the forward and rotational
     velocity.
     """
-    discrete_vs = np.linspace(0, 1, 3)
-    discrete_ws = np.linspace(-np.pi, np.pi, 5)  # make sure it's uneven, so that 0. is in there
-    discrete_actions = []
-    for v in discrete_vs:
-        for w in discrete_ws:
-            discrete_actions.append(np.array([v, w]))
-    experiment = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS, BATCH, MEMORY_SIZE,
+    discrete_actions = list(np.linspace(0.00001, 1., 10, dtype=np.float32))
+    discrete_actions = [np.array([action,]) for action in discrete_actions]
+    experiment = Experiment("PathFollower-FeedbackLinearized-v0", discrete_actions, NUM_RUNS, BATCH, MEMORY_SIZE,
                             MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA)
     experiment.run()
     experiment.plot_rewards()
+    experiment.plot_actions()
 
 
 if __name__ == "__main__":

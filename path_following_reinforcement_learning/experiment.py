@@ -1,11 +1,14 @@
 import random
 
 import gym
+# noinspection PyUnresolvedReferences
+import gym_path
 import numpy as np
 from matplotlib import pyplot as plt
 
 from path_following_reinforcement_learning.deep_q_network import DQN
 from path_following_reinforcement_learning.memory import Memory, Experience
+from gym import logger
 
 
 class Experiment():
@@ -23,6 +26,8 @@ class Experiment():
         self.train_network = DQN(self.num_states, self.num_actions, gamma)
         self.target_network = DQN(self.num_states, self.num_actions, gamma)
         self.rewards = []
+        self.actions = []
+        self.run_started = False
 
     @property
     def num_states(self):
@@ -32,11 +37,10 @@ class Experiment():
     def num_actions(self):
         return len(self.discrete_actions)
 
-    def _reset(self):
-        self.rewards = []
-
     def run(self):
-        self._reset()
+        if self.run_started:
+            logger.WARN('You should not run a single experiment twice!!')
+        self.run_started = True
         try:
             for i_episode in range(self.num_runs):
                 observation = self.env.reset()
@@ -50,6 +54,7 @@ class Experiment():
                         action_index = np.argmax(prediction)
 
                     action = self.discrete_actions[action_index]
+                    self.actions.append(action)
                     prev_observation = observation
                     observation, reward, done, info = self.env.step(action)
                     cumulative_reward += reward
@@ -70,9 +75,19 @@ class Experiment():
             pass
         self.env.close()
 
-    def analyze(self):
+    def plot_rewards(self):
         plt.plot(range(len(self.rewards)), self.rewards)
         plt.xlabel('Games number')
         plt.ylabel('Reward')
         plt.yscale('symlog')
         plt.show()
+
+    def plot_actions(self):
+        if len(self.actions[0]) > 1:
+            raise UserWarning(f"Cannot plot {len(self.actions[0])}d actions")
+        plt.plot(range(len(self.actions)), self.actions)
+        plt.xlabel('Simulation step')
+        plt.ylabel('Action')
+        plt.yscale('symlog')
+        plt.show()
+
