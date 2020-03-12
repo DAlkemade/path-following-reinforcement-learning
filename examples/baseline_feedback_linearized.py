@@ -13,6 +13,8 @@ SPEED = 1.
 num_states = len(env.observation_space.sample())
 
 
+# TODO clean up this class or delete (probably possible by using the new gym env and sending a constant action
+
 def feedback_linearized(pose, velocity, epsilon):
     u = 0.  # [m/s]
     w = 0.  # [rad/s] going counter-clockwise.
