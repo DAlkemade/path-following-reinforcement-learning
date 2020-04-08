@@ -9,6 +9,7 @@ BATCH = 15
 COPY_STEP = 25
 MAX_STEPS_IN_RUN = 1000
 MEMORY_SIZE = 10000
+NUM_LAYERS = 1
 
 
 def main():
@@ -28,7 +29,7 @@ def main():
             discrete_actions.append(np.array([v, w]))
 
     experiment = Experiment("PathFollower-FeedbackLinearized-v0", discrete_actions, NUM_RUNS, BATCH, MEMORY_SIZE,
-                            MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA)
+                            MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, NUM_LAYERS)
     experiment.run()
     experiment.plot_rewards()
     experiment.plot_actions()

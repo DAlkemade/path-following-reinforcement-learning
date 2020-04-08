@@ -4,6 +4,7 @@ import gym
 # noinspection PyUnresolvedReferences
 import gym_path
 import numpy as np
+import tqdm
 from matplotlib import pyplot as plt
 
 from path_following_reinforcement_learning.deep_q_network import DQN
@@ -13,7 +14,7 @@ from gym import logger
 
 class Experiment():
     def __init__(self, env_name: str, discrete_actions: list, num_runs: int, train_step: int, memory_size: int,
-                 max_steps_in_run: int, epsilon: float, copy_step: int, gamma: float):
+                 max_steps_in_run: int, epsilon: float, copy_step: int, gamma: float, num_layers: int):
         self.copy_step = copy_step
         self.epsilon = epsilon
         self.max_steps_in_run = max_steps_in_run
@@ -23,8 +24,8 @@ class Experiment():
         self.env = gym.make(env_name)
 
         self.memory = Memory(memory_size)
-        self.train_network = DQN(self.num_states, self.num_actions, gamma)
-        self.target_network = DQN(self.num_states, self.num_actions, gamma)
+        self.train_network = DQN(self.num_states, self.num_actions, gamma, num_layers)
+        self.target_network = DQN(self.num_states, self.num_actions, gamma, num_layers)
         self.rewards = []
         self.actions = []
         self.run_started = False
@@ -42,7 +43,7 @@ class Experiment():
             logger.WARN('You should not run a single experiment twice!!')
         self.run_started = True
         try:
-            for i_episode in range(self.num_runs):
+            for i_episode in tqdm.tqdm(range(self.num_runs)):
                 observation = self.env.reset()
                 cumulative_reward = 0.
                 for t in range(1, self.max_steps_in_run + 1):
@@ -106,3 +107,17 @@ def plot_rewards(reward_lists: list, legend_entries:list = None):
     if add_legend:
         plt.legend()
     plt.show()
+
+
+def compare_experiments(experiments: dict):
+    """Deep Q network for differential robot control.
+
+    Learn to control the robot in the PathFollower environment where the actions are the forward and rotational
+    velocity.
+    """
+    for name, experiment in experiments.items():
+        experiment.run()
+
+    rewards = [experiment.rewards for experiment in experiments.values()]
+    names = list(experiments.keys())
+    plot_rewards(rewards, names)

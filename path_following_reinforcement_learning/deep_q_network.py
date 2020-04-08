@@ -3,15 +3,25 @@ import tensorflow as tf
 
 
 class DQN(object):
-    def __init__(self, observation_space_size, action_space_size, discount_factor: float, learning_rate: float = .01, dropout: float = .2, nodes: int = 128):
+    def __init__(self, observation_space_size, action_space_size, discount_factor: float, num_layers: int,
+                 learning_rate: float = .01, dropout: float = .2, nodes: int = 128):
         self.discount_factor = discount_factor
         self.action_space_size = action_space_size
-        self.model = tf.keras.models.Sequential([
-            tf.keras.layers.Flatten(input_shape=(observation_space_size,)),
-            tf.keras.layers.Dense(nodes, activation='relu'),
+        # layers = [tf.keras.layers.Flatten(input_shape=(observation_space_size,)), ] + [
+        #     tf.keras.layers.Dense(nodes, activation='relu')] * num_layers + [tf.keras.layers.Dropout(dropout),
+        #                                                                      tf.keras.layers.Dense(
+        #                                                                          self.action_space_size)]
+        front = [
+            tf.keras.layers.Flatten(input_shape=(observation_space_size,)),]
+        mid = list()
+        for i in range(num_layers):
+            mid.append(tf.keras.layers.Dense(nodes, activation='relu'))
+        end = [
             tf.keras.layers.Dropout(dropout),
             tf.keras.layers.Dense(self.action_space_size)
-        ])
+        ]
+        layers = front + mid + end
+        self.model = tf.keras.models.Sequential(layers)
         self.optimizer = tf.optimizers.Adam(learning_rate)
 
     def predict(self, states):
