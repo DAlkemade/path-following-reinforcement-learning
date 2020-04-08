@@ -9,7 +9,7 @@ EPSILON = .1
 GAMMA = .99
 TRAIN_STEP = 15
 COPY_STEP = 25
-MAX_STEPS_IN_RUN = 10000
+MAX_STEPS_IN_RUN = 1000
 MEMORY_SIZE = 10000
 NUM_LAYERS = 1
 
@@ -18,12 +18,24 @@ def main():
     discrete_actions = create_discrete_u_w()
     experiments = dict()
 
-    experiments['1 layer'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
+    experiments['1 layer A'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
                                         TRAIN_STEP, MEMORY_SIZE,
-                                        MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 2)
-    experiments['2 layers'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
+                                        MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 1)
+    experiments['1 layer B'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
+                                          TRAIN_STEP, MEMORY_SIZE,
+                                          MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 1)
+    experiments['1 layer C'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
+                                          TRAIN_STEP, MEMORY_SIZE,
+                                          MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 1)
+    experiments['2 layers A'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
                                          TRAIN_STEP, MEMORY_SIZE,
-                                         MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 1)
+                                         MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 2)
+    experiments['2 layers B'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
+                                         TRAIN_STEP, MEMORY_SIZE,
+                                         MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 2)
+    experiments['2 layers C'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
+                                         TRAIN_STEP, MEMORY_SIZE,
+                                         MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 2)
     compare_experiments(experiments, "PathFollowerTestSuite-v0")
 
 

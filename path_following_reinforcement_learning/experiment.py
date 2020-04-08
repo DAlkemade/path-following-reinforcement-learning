@@ -5,6 +5,7 @@ import gym
 import gym_path
 import numpy as np
 import tqdm
+import pandas as pd
 from gym import logger
 from matplotlib import pyplot as plt
 
@@ -155,6 +156,11 @@ def compare_experiments(experiments: dict, test_env: str):
     names = list(experiments.keys())
     plot_rewards(rewards, names, tag='Training')
 
+    smooth_rewards = []
+    for reward in rewards:
+        smooth_rewards.append(list(pd.Series(reward).rolling(20).mean()))
+    plot_rewards(smooth_rewards, names, tag='Training rolling mean')
+
     test_rewards = list()
     mean_test_rewards = list()
     for name, experiment in experiments.items():
@@ -165,3 +171,9 @@ def compare_experiments(experiments: dict, test_env: str):
     plot_rewards(test_rewards, names, tag='Test')
 
     print(list(zip(names, mean_test_rewards)))
+
+    smooth_rewards_test = []
+    for reward in test_rewards:
+        smooth_rewards_test.append(list(pd.Series(reward).rolling(20).mean()))
+    plot_rewards(smooth_rewards, names, tag='Test rolling mean')
+
