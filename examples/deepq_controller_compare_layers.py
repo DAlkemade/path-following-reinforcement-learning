@@ -19,11 +19,11 @@ def main():
     experiments = dict()
 
     experiments['1 layer'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
-                                                    TRAIN_STEP, MEMORY_SIZE,
-                                                    MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 2)
+                                        TRAIN_STEP, MEMORY_SIZE,
+                                        MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 2)
     experiments['2 layers'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
-                                                     TRAIN_STEP, MEMORY_SIZE,
-                                                     MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 1)
+                                         TRAIN_STEP, MEMORY_SIZE,
+                                         MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 1)
     compare_experiments(experiments, "PathFollowerTestSuite-v0")
 
 

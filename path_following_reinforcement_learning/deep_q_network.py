@@ -12,7 +12,7 @@ class DQN(object):
         #                                                                      tf.keras.layers.Dense(
         #                                                                          self.action_space_size)]
         front = [
-            tf.keras.layers.Flatten(input_shape=(observation_space_size,)),]
+            tf.keras.layers.Flatten(input_shape=(observation_space_size,)), ]
         mid = list()
         for i in range(num_layers):
             mid.append(tf.keras.layers.Dense(nodes, activation='relu'))

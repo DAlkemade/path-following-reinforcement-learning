@@ -1,4 +1,3 @@
-import os
 import random
 
 import gym
@@ -6,12 +5,11 @@ import gym
 import gym_path
 import numpy as np
 import tqdm
+from gym import logger
 from matplotlib import pyplot as plt
 
 from path_following_reinforcement_learning.deep_q_network import DQN
 from path_following_reinforcement_learning.memory import Memory, Experience
-from gym import logger
-import pickle
 
 
 class Experiment():
@@ -109,7 +107,6 @@ class Experiment():
         test_env.close()
         return rewards
 
-
     def plot_rewards(self):
         plot_rewards([self.rewards_train])
 
@@ -122,7 +119,8 @@ class Experiment():
         plt.yscale('symlog')
         plt.show()
 
-def plot_rewards(reward_lists: list, legend_entries:list = None, tag=''):
+
+def plot_rewards(reward_lists: list, legend_entries: list = None, tag=''):
     """Plot rewards
 
     @param reward_lists: **list of lists** of rewards
@@ -164,10 +162,6 @@ def compare_experiments(experiments: dict, test_env: str):
         test_rewards.append(reward)
         mean_test_rewards.append(np.mean(reward))
 
-
     plot_rewards(test_rewards, names, tag='Test')
 
-    print(list(zip(names,mean_test_rewards)))
-
-
-
+    print(list(zip(names, mean_test_rewards)))
