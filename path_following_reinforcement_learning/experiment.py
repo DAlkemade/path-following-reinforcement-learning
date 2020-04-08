@@ -69,7 +69,7 @@ class Experiment():
                         self.target_network.copy_weights(self.train_network)
 
                     if done:
-                        print(f"Episode {i_episode} finished after {t + 1} timesteps")
+                        logger.debug(f"Episode {i_episode} finished after {t + 1} timesteps")
                         break
 
                 self.rewards_train.append(cumulative_reward)
@@ -99,7 +99,7 @@ class Experiment():
                 cumulative_reward += reward
 
                 if done:
-                    print(f"Episode {i_episode} finished after {t + 1} timesteps")
+                    logger.debug(f"Episode {i_episode} finished after {t + 1} timesteps")
                     break
 
             rewards.append(cumulative_reward)

@@ -2,6 +2,7 @@ import gym
 # noinspection PyUnresolvedReferences
 import gym_path
 import numpy as np
+from gym import logger
 
 env = gym.make("PathFollower-v0")
 
@@ -78,6 +79,6 @@ for i_episode in range(20):
         print(action)
         observation, reward, done, info = env.step(action)
         if done:
-            print("Episode finished after {} timesteps".format(t + 1))
+            logger.debug("Episode finished after {} timesteps".format(t + 1))
             break
 env.close()
