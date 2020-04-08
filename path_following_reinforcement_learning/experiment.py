@@ -12,13 +12,13 @@ from gym import logger
 
 
 class Experiment():
-    def __init__(self, env_name: str, discrete_actions: list, num_runs: int, batch: int, memory_size: int,
+    def __init__(self, env_name: str, discrete_actions: list, num_runs: int, train_step: int, memory_size: int,
                  max_steps_in_run: int, epsilon: float, copy_step: int, gamma: float):
         self.copy_step = copy_step
         self.epsilon = epsilon
         self.max_steps_in_run = max_steps_in_run
         self.num_runs = num_runs
-        self.train_step = batch
+        self.train_step = train_step
         self.discrete_actions = discrete_actions
         self.env = gym.make(env_name)
 
@@ -76,11 +76,7 @@ class Experiment():
         self.env.close()
 
     def plot_rewards(self):
-        plt.plot(range(len(self.rewards)), self.rewards)
-        plt.xlabel('Games number')
-        plt.ylabel('Reward')
-        plt.yscale('symlog')
-        plt.show()
+        plot_rewards([self.rewards])
 
     def plot_actions(self):
         if len(self.actions[0]) > 1:
@@ -91,3 +87,22 @@ class Experiment():
         plt.yscale('symlog')
         plt.show()
 
+def plot_rewards(reward_lists: list, legend_entries:list = None):
+    """Plot rewards
+
+    @param reward_lists: **list of lists** of rewards
+    """
+    add_legend = legend_entries is not None
+    if not add_legend:
+        legend_entries = [None] * len(reward_lists)
+    assert len(reward_lists) == len(legend_entries)
+
+    for i, rewards in enumerate(reward_lists):
+        plt.plot(range(len(rewards)), rewards, label=legend_entries[i])
+
+    plt.xlabel('Games number')
+    plt.ylabel('Reward')
+    plt.yscale('symlog')
+    if add_legend:
+        plt.legend()
+    plt.show()

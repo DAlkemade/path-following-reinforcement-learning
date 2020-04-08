@@ -3,16 +3,16 @@ import tensorflow as tf
 
 
 class DQN(object):
-    def __init__(self, observation_space_size, action_space_size, gamma: float):
-        self.gamma = gamma
+    def __init__(self, observation_space_size, action_space_size, discount_factor: float, learning_rate: float = .01, dropout: float = .2, nodes: int = 128):
+        self.discount_factor = discount_factor
         self.action_space_size = action_space_size
         self.model = tf.keras.models.Sequential([
             tf.keras.layers.Flatten(input_shape=(observation_space_size,)),
-            tf.keras.layers.Dense(128, activation='relu'),
-            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.Dense(nodes, activation='relu'),
+            tf.keras.layers.Dropout(dropout),
             tf.keras.layers.Dense(self.action_space_size)
         ])
-        self.optimizer = tf.optimizers.Adam(0.01)
+        self.optimizer = tf.optimizers.Adam(learning_rate)
 
     def predict(self, states):
         return self.model(states)
@@ -27,7 +27,7 @@ class DQN(object):
         states = np.reshape(states, (batch_size, num_states))
         next_predictions = target_model.predict(next_states)
         next_predictions_max = np.max(next_predictions, axis=1)
-        total_rewards_discounted = rewards + self.gamma * next_predictions_max
+        total_rewards_discounted = rewards + self.discount_factor * next_predictions_max
         total_rewards_discounted_include_done = np.where(dones, rewards, total_rewards_discounted)
         states = tf.convert_to_tensor(states, dtype=tf.float32)
         actions = tf.convert_to_tensor(actions, dtype=tf.int64)
