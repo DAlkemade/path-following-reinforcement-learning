@@ -23,7 +23,7 @@ def main():
     discrete_actions = create_discrete_u_w()
     experiment = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS, TRAIN_STEP, MEMORY_SIZE,
                             MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, NUM_LAYERS)
-    experiment.run()
+    experiment.train()
     experiment.plot_rewards()
 
 

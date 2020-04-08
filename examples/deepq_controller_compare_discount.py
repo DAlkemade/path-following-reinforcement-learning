@@ -24,7 +24,7 @@ def main():
     experiments['Discount factor=0.99'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
                                                      TRAIN_STEP, MEMORY_SIZE,
                                                      MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, .99, NUM_LAYERS)
-    compare_experiments(experiments)
+    compare_experiments(experiments, "PathFollowerTestSuite-v0")
 
 
 if __name__ == "__main__":

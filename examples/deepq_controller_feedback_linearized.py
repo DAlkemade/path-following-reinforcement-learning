@@ -30,7 +30,7 @@ def main():
 
     experiment = Experiment("PathFollower-FeedbackLinearized-v0", discrete_actions, NUM_RUNS, BATCH, MEMORY_SIZE,
                             MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, NUM_LAYERS)
-    experiment.run()
+    experiment.train()
     experiment.plot_rewards()
     experiment.plot_actions()
 

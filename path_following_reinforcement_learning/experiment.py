@@ -1,3 +1,4 @@
+import os
 import random
 
 import gym
@@ -10,6 +11,7 @@ from matplotlib import pyplot as plt
 from path_following_reinforcement_learning.deep_q_network import DQN
 from path_following_reinforcement_learning.memory import Memory, Experience
 from gym import logger
+import pickle
 
 
 class Experiment():
@@ -26,7 +28,7 @@ class Experiment():
         self.memory = Memory(memory_size)
         self.train_network = DQN(self.num_states, self.num_actions, gamma, num_layers)
         self.target_network = DQN(self.num_states, self.num_actions, gamma, num_layers)
-        self.rewards = []
+        self.rewards_train = []
         self.actions = []
         self.run_started = False
 
@@ -38,7 +40,7 @@ class Experiment():
     def num_actions(self):
         return len(self.discrete_actions)
 
-    def run(self):
+    def train(self, render=True):
         if self.run_started:
             logger.WARN('You should not run a single experiment twice!!')
         self.run_started = True
@@ -47,7 +49,8 @@ class Experiment():
                 observation = self.env.reset()
                 cumulative_reward = 0.
                 for t in range(1, self.max_steps_in_run + 1):
-                    self.env.render()
+                    if render:
+                        self.env.render()
                     if random.random() < self.epsilon:
                         action_index = random.randint(0, len(self.discrete_actions) - 1)
                     else:
@@ -71,13 +74,44 @@ class Experiment():
                         print(f"Episode {i_episode} finished after {t + 1} timesteps")
                         break
 
-                self.rewards.append(cumulative_reward)
+                self.rewards_train.append(cumulative_reward)
         except KeyboardInterrupt:
             pass
         self.env.close()
 
+    def test(self, env_name: str, render=True):
+        test_env = gym.make(env_name)
+        rewards = list()
+        try:
+            num_test_paths = len(test_env.paths)
+        except AttributeError:
+            raise ValueError("Provided test environment should have a paths attribute")
+        for i_episode in tqdm.tqdm(range(num_test_paths)):
+            observation = test_env.reset()
+            cumulative_reward = 0.
+            for t in range(1, self.max_steps_in_run + 1):
+                if render:
+                    test_env.render()
+
+                prediction = self.target_network.predict(np.reshape(observation, (1, self.num_states)))
+                action_index = np.argmax(prediction)
+
+                action = self.discrete_actions[action_index]
+                observation, reward, done, info = test_env.step(action)
+                cumulative_reward += reward
+
+                if done:
+                    print(f"Episode {i_episode} finished after {t + 1} timesteps")
+                    break
+
+            rewards.append(cumulative_reward)
+
+        test_env.close()
+        return rewards
+
+
     def plot_rewards(self):
-        plot_rewards([self.rewards])
+        plot_rewards([self.rewards_train])
 
     def plot_actions(self):
         if len(self.actions[0]) > 1:
@@ -88,7 +122,7 @@ class Experiment():
         plt.yscale('symlog')
         plt.show()
 
-def plot_rewards(reward_lists: list, legend_entries:list = None):
+def plot_rewards(reward_lists: list, legend_entries:list = None, tag=''):
     """Plot rewards
 
     @param reward_lists: **list of lists** of rewards
@@ -102,22 +136,38 @@ def plot_rewards(reward_lists: list, legend_entries:list = None):
         plt.plot(range(len(rewards)), rewards, label=legend_entries[i])
 
     plt.xlabel('Games number')
-    plt.ylabel('Reward')
+    plt.ylabel(f'Reward {tag}')
     plt.yscale('symlog')
     if add_legend:
         plt.legend()
     plt.show()
 
 
-def compare_experiments(experiments: dict):
+def compare_experiments(experiments: dict, test_env: str):
     """Deep Q network for differential robot control.
 
     Learn to control the robot in the PathFollower environment where the actions are the forward and rotational
     velocity.
     """
+    logger.info('Train new experiments')
     for name, experiment in experiments.items():
-        experiment.run()
+        experiment.train(render=False)
 
-    rewards = [experiment.rewards for experiment in experiments.values()]
+    rewards = [experiment.rewards_train for experiment in experiments.values()]
     names = list(experiments.keys())
-    plot_rewards(rewards, names)
+    plot_rewards(rewards, names, tag='Training')
+
+    test_rewards = list()
+    mean_test_rewards = list()
+    for name, experiment in experiments.items():
+        reward = experiment.test(test_env, render=True)
+        test_rewards.append(reward)
+        mean_test_rewards.append(np.mean(reward))
+
+
+    plot_rewards(test_rewards, names, tag='Test')
+
+    print(list(zip(names,mean_test_rewards)))
+
+
+
