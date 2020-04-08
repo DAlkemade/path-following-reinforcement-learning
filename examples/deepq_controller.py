@@ -19,8 +19,8 @@ def main():
     Learn to control the robot in the PathFollower environment where the actions are the forward and rotational
     velocity.
     """
-    discrete_vs = np.linspace(0, 1, 3)
-    discrete_ws = np.linspace(-np.pi, np.pi, 5)  # make sure it's uneven, so that 0. is in there
+    discrete_vs = np.linspace(0, 1, 5)
+    discrete_ws = np.linspace(-1., 1., 5)  # make sure it's uneven, so that 0. is in there
     discrete_actions = []
     for v in discrete_vs:
         for w in discrete_ws:

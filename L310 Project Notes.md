@@ -42,14 +42,14 @@ Or can I make v the input to the environment and let the environment do the feed
 
 ## Experiments
 * think about which path points I'm giving the robot. maybe give more, less, or depending on what's in front rather than just the closest
+* larger action space experiment
 * Reduce the number of actions to make it simpler or increase to make larger
-
+* measure time and cumulative error on a test set / dev set
 
 ## Next steps:
 
-* environment maken voor extension
-* Do something with the last nodes
 * Use seed for random path generation
-
+* design test suite of fixed paths of some different forms, i.e. straight, sine, pointy to compare different runs on (cumulative error + time taken)
+    * don't forget to disable exploration and dropout
 ## References
 https://arxiv.org/pdf/1511.04143.pdf about continous action spaces etc

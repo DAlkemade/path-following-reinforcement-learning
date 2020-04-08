@@ -18,7 +18,7 @@ class Experiment():
         self.epsilon = epsilon
         self.max_steps_in_run = max_steps_in_run
         self.num_runs = num_runs
-        self.batch_size = batch
+        self.train_step = batch
         self.discrete_actions = discrete_actions
         self.env = gym.make(env_name)
 
@@ -59,7 +59,7 @@ class Experiment():
                     observation, reward, done, info = self.env.step(action)
                     cumulative_reward += reward
                     self.memory.append(Experience(prev_observation, action_index, reward, observation, done))
-                    if t % self.batch_size == 0:
+                    if t % self.train_step == 0:
                         batch_train = self.memory.all_entries()
                         self.train_network.train(batch_train, self.target_network)
 
