@@ -43,11 +43,13 @@ class Experiment():
         if self.run_started:
             logger.WARN('You should not run a single experiment twice!!')
         self.run_started = True
+        cum_count = 0
         try:
             for i_episode in tqdm.tqdm(range(self.num_runs)):
                 observation = self.env.reset()
                 cumulative_reward = 0.
                 for t in range(1, self.max_steps_in_run + 1):
+                    cum_count += 1
                     if render:
                         self.env.render()
                     if random.random() < self.epsilon:
@@ -62,11 +64,12 @@ class Experiment():
                     observation, reward, done, info = self.env.step(action)
                     cumulative_reward += reward
                     self.memory.append(Experience(prev_observation, action_index, reward, observation, done))
-                    if t % self.train_step == 0:
-                        batch_train = self.memory.all_entries()
+                    if cum_count % self.train_step == 0:
+                        # batch_train = self.memory.all_entries()
+                        batch_train = self.memory.sample(self.train_step)
                         self.train_network.train(batch_train, self.target_network)
 
-                    if t % self.copy_step:
+                    if cum_count % self.copy_step:
                         self.target_network.copy_weights(self.train_network)
 
                     if done:
@@ -175,5 +178,5 @@ def compare_experiments(experiments: dict, test_env: str):
     smooth_rewards_test = []
     for reward in test_rewards:
         smooth_rewards_test.append(list(pd.Series(reward).rolling(20).mean()))
-    plot_rewards(smooth_rewards, names, tag='Test rolling mean')
+    plot_rewards(smooth_rewards_test, names, tag='Test rolling mean')
 

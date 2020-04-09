@@ -4,12 +4,12 @@ import numpy as np
 
 from path_following_reinforcement_learning.experiment import Experiment
 
-NUM_RUNS = 1000
+NUM_RUNS = 3000
 EPSILON = .1
 GAMMA = .99
-TRAIN_STEP = 15
-COPY_STEP = 25
-MAX_STEPS_IN_RUN = 10000
+TRAIN_STEP = 100
+COPY_STEP = 200
+MAX_STEPS_IN_RUN = 1000
 MEMORY_SIZE = 10000
 NUM_LAYERS = 1
 
@@ -23,7 +23,7 @@ def main():
     discrete_actions = create_discrete_u_w()
     experiment = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS, TRAIN_STEP, MEMORY_SIZE,
                             MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, NUM_LAYERS)
-    experiment.train()
+    experiment.train(render=False)
     experiment.plot_rewards()
 
 
