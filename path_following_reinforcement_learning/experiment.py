@@ -20,7 +20,8 @@ class DQNParameters:
 
 class Experiment():
     def __init__(self, env_name: str, discrete_actions: list, num_runs: int, train_step: int, memory_size: int,
-                 max_steps_in_run: int, epsilon: float, copy_step: int, dqn_config: DQNParameters):
+                 max_steps_in_run: int, epsilon: float, copy_step: int, dqn_config: DQNParameters, test_env_name: str = None):
+        self.test_env_name = test_env_name
         self.copy_step = copy_step
         self.epsilon = epsilon
         self.max_steps_in_run = max_steps_in_run
@@ -86,8 +87,10 @@ class Experiment():
             pass
         self.env.close()
 
-    def test(self, env_name: str, render=True):
-        test_env = gym.make(env_name)
+    def test(self, render=True):
+        if self.test_env_name is None:
+            raise ValueError('test environment not set, please do so before calling this method.')
+        test_env = gym.make(self.test_env_name)
         rewards = list()
         try:
             num_test_paths = len(test_env.paths)
@@ -150,7 +153,7 @@ def plot_rewards(reward_lists: list, legend_entries: list = None, tag=''):
     plt.show()
 
 
-def compare_experiments(experiments: dict, test_env: str):
+def compare_experiments(experiments: dict):
     """Deep Q network for differential robot control.
 
     Learn to control the robot in the PathFollower environment where the actions are the forward and rotational
@@ -172,7 +175,7 @@ def compare_experiments(experiments: dict, test_env: str):
     test_rewards = list()
     mean_test_rewards = list()
     for name, experiment in experiments.items():
-        reward = experiment.test(test_env, render=True)
+        reward = experiment.test(render=True)
         test_rewards.append(reward)
         mean_test_rewards.append(np.mean(reward))
 

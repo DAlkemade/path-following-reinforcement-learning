@@ -16,10 +16,10 @@ def main():
     dqn_config1 = DQNParameters(.9, config.num_layers)
     dqn_config2 = DQNParameters(.99, config.num_layers)
     experiments['Discount factor=0.9'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS, config.batch_size, config.memory_size,
-                            config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config1)
+                            config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config1, test_env_name="PathFollowerTestSuite-v0")
     experiments['Discount factor=0.99'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS, config.batch_size, config.memory_size,
-                            config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config2)
-    compare_experiments(experiments, "PathFollowerTestSuite-v0")
+                            config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config2, test_env_name="PathFollowerTestSuite-v0")
+    compare_experiments(experiments)
 
 
 if __name__ == "__main__":
