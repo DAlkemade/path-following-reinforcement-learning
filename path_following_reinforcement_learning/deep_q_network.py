@@ -4,7 +4,7 @@ import tensorflow as tf
 
 class DQN(object):
     def __init__(self, observation_space_size, action_space_size, discount_factor: float, num_layers: int,
-                 learning_rate: float = .01, dropout: float = .2, nodes: int = 128):
+                 learning_rate: float, dropout: float = .2, nodes: int = 128):
         self.discount_factor = discount_factor
         self.action_space_size = action_space_size
         # layers = [tf.keras.layers.Flatten(input_shape=(observation_space_size,)), ] + [

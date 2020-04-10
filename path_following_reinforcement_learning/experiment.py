@@ -27,8 +27,8 @@ class Experiment():
         self.env = gym.make(env_name)
 
         self.memory = Memory(config.memory_size)
-        self.train_network = DQN(self.num_states, self.num_actions, config.gamma, config.num_layers)
-        self.target_network = DQN(self.num_states, self.num_actions, config.gamma, config.num_layers)
+        self.train_network = DQN(self.num_states, self.num_actions, config.gamma, config.num_layers, config.learning_rate)
+        self.target_network = DQN(self.num_states, self.num_actions, config.gamma, config.num_layers, config.learning_rate)
         self.rewards_train = []
         self.actions = []
         self.run_started = False
