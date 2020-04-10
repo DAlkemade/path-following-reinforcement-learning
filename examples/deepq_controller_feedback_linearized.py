@@ -1,7 +1,7 @@
 import numpy as np
 
-from examples.hyperparameters import Config
-from path_following_reinforcement_learning.experiment import Experiment, DQNParameters
+from path_following_reinforcement_learning.config import Config
+from path_following_reinforcement_learning.experiment import Experiment
 
 NUM_RUNS = 1000
 
@@ -27,10 +27,7 @@ def main():
 
     discrete_actions = create_discrete_actions_epsilon_kp()
     config = Config()
-    dqn_config = DQNParameters(config.gamma, config.num_layers)
-    experiment = Experiment("PathFollower-FeedbackLinearized-v0", discrete_actions, NUM_RUNS, config.batch_size,
-                            config.memory_size,
-                            config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config)
+    experiment = Experiment("PathFollower-FeedbackLinearized-v0", discrete_actions, NUM_RUNS, config)
     experiment.train()
     experiment.plot_rewards()
     experiment.plot_actions()

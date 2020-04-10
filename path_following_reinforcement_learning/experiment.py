@@ -9,32 +9,26 @@ import tqdm
 from gym import logger
 from matplotlib import pyplot as plt
 
+from path_following_reinforcement_learning.config import Config
 from path_following_reinforcement_learning.deep_q_network import DQN
 from path_following_reinforcement_learning.memory import Memory, Experience
 
 
-class DQNParameters:
-    def __init__(self, gamma: float, num_layers: int):
-        self.num_layers = num_layers
-        self.gamma = gamma
-
-
 class Experiment():
-    def __init__(self, env_name: str, discrete_actions: list, num_runs: int, train_step: int, memory_size: int,
-                 max_steps_in_run: int, epsilon: float, copy_step: int, dqn_config: DQNParameters,
+    def __init__(self, env_name: str, discrete_actions: list, num_runs: int, config: Config,
                  test_env_name: str = None):
         self.test_env_name = test_env_name
-        self.copy_step = copy_step
-        self.epsilon = epsilon
-        self.max_steps_in_run = max_steps_in_run
+        self.copy_step = config.copy_step
+        self.epsilon = config.epsilon
+        self.max_steps_in_run = config.max_steps_in_run
         self.num_runs = num_runs
-        self.train_step = train_step
+        self.train_step = config.batch_size
         self.discrete_actions = discrete_actions
         self.env = gym.make(env_name)
 
-        self.memory = Memory(memory_size)
-        self.train_network = DQN(self.num_states, self.num_actions, dqn_config.gamma, dqn_config.num_layers)
-        self.target_network = DQN(self.num_states, self.num_actions, dqn_config.gamma, dqn_config.num_layers)
+        self.memory = Memory(config.memory_size)
+        self.train_network = DQN(self.num_states, self.num_actions, config.gamma, config.num_layers)
+        self.target_network = DQN(self.num_states, self.num_actions, config.gamma, config.num_layers)
         self.rewards_train = []
         self.actions = []
         self.run_started = False
