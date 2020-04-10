@@ -12,10 +12,15 @@ from matplotlib import pyplot as plt
 from path_following_reinforcement_learning.deep_q_network import DQN
 from path_following_reinforcement_learning.memory import Memory, Experience
 
+class DQNParameters:
+    def __init__(self, gamma: float, num_layers: int):
+        self.num_layers = num_layers
+        self.gamma = gamma
+
 
 class Experiment():
     def __init__(self, env_name: str, discrete_actions: list, num_runs: int, train_step: int, memory_size: int,
-                 max_steps_in_run: int, epsilon: float, copy_step: int, gamma: float, num_layers: int):
+                 max_steps_in_run: int, epsilon: float, copy_step: int, dqn_config: DQNParameters):
         self.copy_step = copy_step
         self.epsilon = epsilon
         self.max_steps_in_run = max_steps_in_run
@@ -25,8 +30,8 @@ class Experiment():
         self.env = gym.make(env_name)
 
         self.memory = Memory(memory_size)
-        self.train_network = DQN(self.num_states, self.num_actions, gamma, num_layers)
-        self.target_network = DQN(self.num_states, self.num_actions, gamma, num_layers)
+        self.train_network = DQN(self.num_states, self.num_actions, dqn_config.gamma, dqn_config.num_layers)
+        self.target_network = DQN(self.num_states, self.num_actions, dqn_config.gamma, dqn_config.num_layers)
         self.rewards_train = []
         self.actions = []
         self.run_started = False
@@ -161,7 +166,7 @@ def compare_experiments(experiments: dict, test_env: str):
 
     smooth_rewards = []
     for reward in rewards:
-        smooth_rewards.append(list(pd.Series(reward).rolling(20).mean()))
+        smooth_rewards.append(list(pd.Series(reward).rolling(100).mean()))
     plot_rewards(smooth_rewards, names, tag='Training rolling mean')
 
     test_rewards = list()
@@ -177,6 +182,6 @@ def compare_experiments(experiments: dict, test_env: str):
 
     smooth_rewards_test = []
     for reward in test_rewards:
-        smooth_rewards_test.append(list(pd.Series(reward).rolling(20).mean()))
+        smooth_rewards_test.append(list(pd.Series(reward).rolling(5).mean()))
     plot_rewards(smooth_rewards_test, names, tag='Test rolling mean')
 

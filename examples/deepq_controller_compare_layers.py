@@ -2,39 +2,37 @@
 import gym_path
 
 from examples.deepq_controller import create_discrete_u_w
-from path_following_reinforcement_learning.experiment import Experiment, compare_experiments
+from examples.hyperparameters import Config
+from path_following_reinforcement_learning.experiment import Experiment, compare_experiments, DQNParameters
 
 NUM_RUNS = 9000
-EPSILON = .1
-GAMMA = .99
-TRAIN_STEP = 20
-COPY_STEP = 50
-MAX_STEPS_IN_RUN = 1000
-MEMORY_SIZE = 10000
 
 
 def main():
     discrete_actions = create_discrete_u_w()
     experiments = dict()
+    config = Config()
 
+    dqn_config1 = DQNParameters(config.gamma, 1)
+    dqn_config2 = DQNParameters(config.gamma, 2)
     experiments['1 layer A'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
-                                        TRAIN_STEP, MEMORY_SIZE,
-                                        MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 1)
+                                          config.batch_size, config.memory_size,
+                                          config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config1)
     experiments['1 layer B'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
-                                          TRAIN_STEP, MEMORY_SIZE,
-                                          MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 1)
+                                          config.batch_size, config.memory_size,
+                                          config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config1)
     experiments['1 layer C'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
-                                          TRAIN_STEP, MEMORY_SIZE,
-                                          MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 1)
+                                          config.batch_size, config.memory_size,
+                                          config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config1)
     experiments['2 layers A'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
-                                         TRAIN_STEP, MEMORY_SIZE,
-                                         MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 2)
+                                           config.batch_size, config.memory_size,
+                                           config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config2)
     experiments['2 layers B'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
-                                         TRAIN_STEP, MEMORY_SIZE,
-                                         MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 2)
+                                           config.batch_size, config.memory_size,
+                                           config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config2)
     experiments['2 layers C'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
-                                         TRAIN_STEP, MEMORY_SIZE,
-                                         MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, 2)
+                                           config.batch_size, config.memory_size,
+                                           config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config2)
     compare_experiments(experiments, "PathFollowerTestSuite-v0")
 
 

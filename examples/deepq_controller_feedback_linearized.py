@@ -1,15 +1,9 @@
 import numpy as np
 
-from path_following_reinforcement_learning.experiment import Experiment
+from examples.hyperparameters import Config
+from path_following_reinforcement_learning.experiment import Experiment, DQNParameters
 
 NUM_RUNS = 1000
-EPSILON = .1
-GAMMA = .99
-BATCH = 15
-COPY_STEP = 25
-MAX_STEPS_IN_RUN = 1000
-MEMORY_SIZE = 10000
-NUM_LAYERS = 2
 
 
 def main():
@@ -27,9 +21,10 @@ def main():
     for v in discrete_epsilons:
         for w in discrete_kps:
             discrete_actions.append(np.array([v, w]))
-
-    experiment = Experiment("PathFollower-FeedbackLinearized-v0", discrete_actions, NUM_RUNS, BATCH, MEMORY_SIZE,
-                            MAX_STEPS_IN_RUN, EPSILON, COPY_STEP, GAMMA, NUM_LAYERS)
+    config = Config()
+    dqn_config = DQNParameters(config.gamma, config.num_layers)
+    experiment = Experiment("PathFollower-FeedbackLinearized-v0", discrete_actions, NUM_RUNS, config.batch_size, config.memory_size,
+                            config.max_steps_in_run, config.epsilon, config.copy_step, dqn_config)
     experiment.train()
     experiment.plot_rewards()
     experiment.plot_actions()
