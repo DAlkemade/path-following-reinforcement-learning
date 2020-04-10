@@ -4,13 +4,14 @@ import gym
 # noinspection PyUnresolvedReferences
 import gym_path
 import numpy as np
-import tqdm
 import pandas as pd
+import tqdm
 from gym import logger
 from matplotlib import pyplot as plt
 
 from path_following_reinforcement_learning.deep_q_network import DQN
 from path_following_reinforcement_learning.memory import Memory, Experience
+
 
 class DQNParameters:
     def __init__(self, gamma: float, num_layers: int):
@@ -20,7 +21,8 @@ class DQNParameters:
 
 class Experiment():
     def __init__(self, env_name: str, discrete_actions: list, num_runs: int, train_step: int, memory_size: int,
-                 max_steps_in_run: int, epsilon: float, copy_step: int, dqn_config: DQNParameters, test_env_name: str = None):
+                 max_steps_in_run: int, epsilon: float, copy_step: int, dqn_config: DQNParameters,
+                 test_env_name: str = None):
         self.test_env_name = test_env_name
         self.copy_step = copy_step
         self.epsilon = epsilon
@@ -187,4 +189,3 @@ def compare_experiments(experiments: dict):
     for reward in test_rewards:
         smooth_rewards_test.append(list(pd.Series(reward).rolling(5).mean()))
     plot_rewards(smooth_rewards_test, names, tag='Test rolling mean')
-
