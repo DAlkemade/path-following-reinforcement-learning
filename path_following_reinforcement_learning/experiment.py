@@ -67,8 +67,8 @@ class Experiment():
                     cumulative_reward += reward
                     self.memory.append(Experience(prev_observation, action_index, reward, observation, done))
                     if cum_count % self.train_step == 0:
-                        # batch_train = self.memory.all_entries()
-                        batch_train = self.memory.sample(self.train_step)
+                        batch_train = self.memory.all_entries()
+                        # batch_train = self.memory.sample(self.train_step)
                         self.train_network.train(batch_train, self.target_network)
 
                     if cum_count % self.copy_step:

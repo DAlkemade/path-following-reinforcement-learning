@@ -6,7 +6,7 @@ from examples.deepq_controller_feedback_linearized import create_discrete_action
 from path_following_reinforcement_learning.config import Config
 from path_following_reinforcement_learning.experiment import Experiment, compare_experiments
 
-NUM_RUNS = 8000
+NUM_RUNS = 1000
 
 
 def create_extension_experiment(config: Config, discrete_actions, env: str, test_env: str):

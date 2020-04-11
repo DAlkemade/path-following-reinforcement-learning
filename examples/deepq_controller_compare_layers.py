@@ -5,7 +5,7 @@ from examples.deepq_controller import create_discrete_u_w
 from path_following_reinforcement_learning.config import Config
 from path_following_reinforcement_learning.experiment import Experiment, compare_experiments
 
-NUM_RUNS = 9000
+NUM_RUNS = 1000
 
 
 def main():

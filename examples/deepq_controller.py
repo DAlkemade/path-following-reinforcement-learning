@@ -5,7 +5,7 @@ import numpy as np
 from path_following_reinforcement_learning.config import Config
 from path_following_reinforcement_learning.experiment import Experiment
 
-NUM_RUNS = 3000
+NUM_RUNS = 1000
 
 
 def main():
