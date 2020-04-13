@@ -66,10 +66,14 @@ class Experiment():
                     observation, reward, done, info = self.env.step(action)
                     cumulative_reward += reward
                     self.memory.append(Experience(prev_observation, action_index, reward, observation, done))
-                    if cum_count % self.train_step == 0:
+                    if cum_count % 1 == 0:
                         # batch_train = self.memory.all_entries()
-                        batch_train = self.memory.sample(self.train_step)
-                        self.train_network.train(batch_train, self.target_network)
+                        try:
+                            batch_train = self.memory.sample(self.train_step)
+                            self.train_network.train(batch_train, self.target_network)
+                        except ValueError:
+                            # Not enough samples in memory yet. Just wait
+                            pass
 
                     if cum_count % self.copy_step:
                         self.target_network.copy_weights(self.train_network)
