@@ -22,7 +22,7 @@ class Experiment():
         self.epsilon = config.epsilon
         self.max_steps_in_run = config.max_steps_in_run
         self.num_runs = num_runs
-        self.train_step = config.batch_size
+        self.train_step = config.train_step
         self.discrete_actions = discrete_actions
         self.env = gym.make(env_name)
 
@@ -41,7 +41,7 @@ class Experiment():
     def num_actions(self):
         return len(self.discrete_actions)
 
-    def train(self, render=True):
+    def train(self, render=True, full_memory=True):
         if self.run_started:
             logger.WARN('You should not run a single experiment twice!!')
         self.run_started = True
@@ -66,14 +66,18 @@ class Experiment():
                     observation, reward, done, info = self.env.step(action)
                     cumulative_reward += reward
                     self.memory.append(Experience(prev_observation, action_index, reward, observation, done))
-                    if cum_count % 1 == 0:
-                        # batch_train = self.memory.all_entries()
+                    if cum_count % self.train_step == 0:
                         try:
-                            batch_train = self.memory.sample(self.train_step)
+                            if full_memory:
+                                batch_train = self.memory.all_entries()
+                            else:
+
+                                batch_train = self.memory.sample(self.train_step)
                             self.train_network.train(batch_train, self.target_network)
+
                         except ValueError:
                             # Not enough samples in memory yet. Just wait
-                            pass
+                            continue
 
                     if cum_count % self.copy_step:
                         self.target_network.copy_weights(self.train_network)
