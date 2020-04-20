@@ -157,7 +157,7 @@ def plot_rewards(reward_lists: list, legend_entries: list = None, tag=''):
     plt.show()
 
 
-def compare_experiments(experiments: dict):
+def compare_experiments(experiments: dict, full_memory=True):
     """Deep Q network for differential robot control.
 
     Learn to control the robot in the PathFollower environment where the actions are the forward and rotational
@@ -165,7 +165,7 @@ def compare_experiments(experiments: dict):
     """
     logger.info('Train new experiments')
     for name, experiment in experiments.items():
-        experiment.train(render=False)
+        experiment.train(render=False, full_memory=full_memory)
 
     rewards = [experiment.rewards_train for experiment in experiments.values()]
     names = list(experiments.keys())
@@ -179,7 +179,7 @@ def compare_experiments(experiments: dict):
     test_rewards = list()
     mean_test_rewards = list()
     for name, experiment in experiments.items():
-        reward = experiment.test(render=True)
+        reward = experiment.test(render=False)
         test_rewards.append(reward)
         mean_test_rewards.append(np.mean(reward))
 

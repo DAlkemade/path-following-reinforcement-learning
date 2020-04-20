@@ -7,7 +7,7 @@ NUM_RUNS = 1000
 
 
 def create_discrete_actions_epsilon_kp():
-    discrete_epsilons = np.linspace(0.00001, .5, 5, dtype=np.float32)
+    discrete_epsilons = np.linspace(0.00001, .3, 5, dtype=np.float32)
     discrete_kps = np.linspace(0.0, 1., 3, dtype=np.float32)
     discrete_actions = []
     for v in discrete_epsilons:

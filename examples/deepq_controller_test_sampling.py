@@ -24,7 +24,7 @@ def main():
     experiments['2 layers C'] = Experiment("PathFollower-DifferentPaths-v0", discrete_actions, NUM_RUNS,
                                            config2,
                                            test_env_name="PathFollowerTestSuite-v0")
-    compare_experiments(experiments)
+    compare_experiments(experiments, full_memory=False)
 
 
 if __name__ == "__main__":
