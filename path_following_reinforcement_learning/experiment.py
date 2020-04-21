@@ -1,3 +1,4 @@
+import pickle
 import random
 
 import gym
@@ -91,7 +92,7 @@ class Experiment():
             pass
         self.env.close()
 
-    def test(self, render=True):
+    def test(self, render=True, print_actions=False):
         if self.test_env_name is None:
             raise ValueError('test environment not set, please do so before calling this method.')
         test_env = gym.make(self.test_env_name)
@@ -111,6 +112,8 @@ class Experiment():
                 action_index = np.argmax(prediction)
 
                 action = self.discrete_actions[action_index]
+                if print_actions:
+                    print(action)
                 observation, reward, done, info = test_env.step(action)
                 cumulative_reward += reward
 
@@ -166,6 +169,9 @@ def compare_experiments(experiments: dict, full_memory=True):
     logger.info('Train new experiments')
     for name, experiment in experiments.items():
         experiment.train(render=False, full_memory=full_memory)
+
+        experiment.target_network.model.save(f'model_{name}.h5')
+
 
     rewards = [experiment.rewards_train for experiment in experiments.values()]
     names = list(experiments.keys())

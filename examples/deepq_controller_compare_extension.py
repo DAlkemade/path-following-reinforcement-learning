@@ -15,17 +15,10 @@ def create_extension_experiment(config: Config, discrete_actions, env: str, test
 
 
 def main():
-    discrete_actions_regular = create_discrete_u_w()
     discrete_actions_extension = create_discrete_actions_epsilon_kp()
     experiments = dict()
     config = Config()
 
-    experiments['Regular A'] = create_extension_experiment(config, discrete_actions_regular,
-                                                           "PathFollower-DifferentPaths-v0", "PathFollowerTestSuite-v0")
-    experiments['Regular B'] = create_extension_experiment(config, discrete_actions_regular,
-                                                           "PathFollower-DifferentPaths-v0", "PathFollowerTestSuite-v0")
-    experiments['Regular C'] = create_extension_experiment(config, discrete_actions_regular,
-                                                           "PathFollower-DifferentPaths-v0", "PathFollowerTestSuite-v0")
     experiments['Extension A'] = create_extension_experiment(config, discrete_actions_extension,
                                                              "PathFollower-FeedbackLinearized-v0",
                                                              "PathFollower-FeedbackLinearizedTestSuite-v0")

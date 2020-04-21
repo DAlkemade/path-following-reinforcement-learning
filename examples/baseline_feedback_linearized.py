@@ -2,6 +2,7 @@ import gym
 # noinspection PyUnresolvedReferences
 import gym_path
 import numpy as np
+import tqdm
 from gym import logger
 from gym_path.envs import PathFeedbackLinearizedTestSuite
 
@@ -15,15 +16,19 @@ num_test_paths = len(env.paths)
 actions = create_discrete_actions_epsilon_kp()
 action = actions[8]
 print(action)
-for i_episode in range(num_test_paths):
+rewards = []
+for i_episode in tqdm.tqdm(range(num_test_paths)):
     observation = env.reset()
+    reward_cum = 0
     for t in range(300):
-        env.render()
-        path_points = np.reshape(observation, (int(num_states / 2), 2))
+        # env.render()
 
         # action = env.action_space.sample()
         observation, reward, done, info = env.step(action)
+        reward_cum += reward
         if done:
             logger.debug("Episode finished after {} timesteps".format(t + 1))
             break
+    rewards.append(reward_cum)
 env.close()
+print(f'mean reward: {np.mean(rewards)}')
